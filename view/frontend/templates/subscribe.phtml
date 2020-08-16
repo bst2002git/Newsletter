@@ -1,0 +1,21 @@
+<div class="block newsletter">
+    <div class="title"><strong><?= $block->escapeHtml(__('Newsletter')) ?></strong></div>
+    <div class="content">
+        <span data-bind="scope: 'majidiannewsletter'">
+            <!-- ko template: getTemplate() --><!-- /ko -->
+        </span>
+    </div>
+</div>
+<script type="text/x-magento-init">
+    {
+    "*": {
+        "Magento_Ui/js/core/app": {
+            "components": {
+                "majidiannewsletter": {
+                    "component": "Majidian_Newsletter/js/view/newsletter"
+                }
+            }
+        }
+    }
+}
+</script>

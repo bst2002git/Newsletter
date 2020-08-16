@@ -1,0 +1,24 @@
+{
+    "name": "majidian/module-newsletter",
+    "description": "Magento 2 Coding Evaluation/Challenge.",
+    "require": {
+        "magento/framework": ">102"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "David Majidian",
+            "email": "dmajidian@hotmail.com"
+        }
+    ],
+    "type": "magento2-module",
+    "version": "1.0.0",
+    "autoload": {
+        "files": [
+            "registration.php"
+        ],
+        "psr-4": {
+            "Majidian\\Newsletter\\": ""
+        }
+    }
+}

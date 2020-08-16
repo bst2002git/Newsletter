@@ -1,0 +1,19 @@
+<form id="majidiannewsletter">
+    <fieldset class="fieldset">
+        <div class="field name required">
+            <label data-bind="i18n: 'Newsletter'"></label>
+            <div class="control">
+                <input
+                    name="email"
+                    id="email"
+                    class="input-text"
+                    type="text"
+                    data-bind="value: email"
+                    required
+                    data-validate="{'required':true, 'validate-email':true}"
+                />
+            </div>
+        </div>
+        <button data-bind=" click: subscribe">Subscribe</button>
+    </fieldset>
+</form>

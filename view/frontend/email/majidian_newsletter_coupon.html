@@ -1,0 +1,13 @@
+{{template config_path="design/email/header_template"}}
+<!--@subject Majidian Newsletter - Coupon Code @-->
+<table class="message-details">
+    <tr>
+        <td><b>{{trans "Subject"}}</b></td>
+        <td>{{var subject}}</td>
+    </tr>
+    <tr>
+        <td><b>{{trans "Coupon Code"}}</b></td>
+        <td>{{var coupon}}</td>
+    </tr>
+</table>
+{{template config_path="design/email/footer_template"}}

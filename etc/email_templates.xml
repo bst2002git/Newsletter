@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Email:etc/email_templates.xsd">
+    <template
+            id="majidian_newsletter_coupon"
+            label="Newsletter Form"
+            file="majidian_newsletter_coupon.html"
+            type="html"
+            module="Majidian_Newsletter"
+            area="frontend"/>
+</config>
