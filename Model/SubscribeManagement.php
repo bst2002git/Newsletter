@@ -86,15 +86,15 @@ class SubscribeManagement implements SubscribeManagementInterface
                     $subscriber->subscribe($email);
                     $status = 1;
                     $ruleId = $this->getRuleId();
-                    $coupon = $this->getCouponCode($ruleId);
-                    $this->sendEmail($email, $coupon);
+                    if ($ruleId !== null) {
+                        $coupon = $this->getCouponCode($ruleId);
+                        $this->sendEmail($email, $coupon);
+                    }
                 }
             } catch (LocalizedException $e) {
                 $status = 0;
-                echo $e->getMessage();die;
             } catch (\Exception $e) {
                 $status = 0;
-                echo $e->getMessage();die;
             }
         }
         return (string) $status;
@@ -137,6 +137,11 @@ class SubscribeManagement implements SubscribeManagementInterface
 
         return;
     }
+
+    /**
+     * @return int|null
+     * @throws LocalizedException
+     */
     private function getRuleId()
     {
         /** @var SearchCriteria $criteria */
@@ -147,8 +152,10 @@ class SubscribeManagement implements SubscribeManagementInterface
         $rules = $this->rule->getList($criteria)->setTotalCount(1)->getItems();
         /** @var \Magento\SalesRule\Model\Data\Rule $rule */
         $rule = reset($rules);
-
-        return $rule->getRuleId();
+        if ($rule) {
+            return $rule->getRuleId();
+        }
+        return null;
     }
 
     /**
