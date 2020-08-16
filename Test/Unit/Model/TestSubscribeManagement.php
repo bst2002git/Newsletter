@@ -15,6 +15,7 @@ use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Mail\Template\TransportBuilder;
 use Majidian\Newsletter\Model\Logger\Logger;
+use Magento\Newsletter\Model\Subscriber;
 
 class TestSubscribeManagement extends TestCase
 {
@@ -28,15 +29,33 @@ class TestSubscribeManagement extends TestCase
     protected $transportBuilder;
     private $_logger;
     private $subscriberManagement;
+    private $subscriber;
 
+    /**
+     * Setup Class Objects.
+     */
     protected function setUp()
     {
         $this->objectManager = new \Magento\Framework\TestFramework\Unit\Helper\ObjectManager($this);
 
+        $this->subscriber = $this->getMockBuilder(Subscriber::class)
+            ->disableOriginalConstructor()
+            ->setMethods(['loadByEmail', 'isSubscribed'])
+            ->getMock();
+        $this->subscriber
+            ->method('loadByEmail')
+            ->willReturn($this->subscriber);
+        $this->subscriber
+            ->method('isSubscribed')
+            ->willReturn(true);
         $this->subscriberFactory = $this->getMockBuilder(SubscriberFactory::class)
             ->disableOriginalConstructor()
-            ->setMethods(['subscribe'])
+            ->setMethods(['create'])
             ->getMock();
+        $this->subscriberFactory
+            ->method('create')
+            ->willReturn($this->subscriber);
+
         $this->ruleRepositoryInterface = $this->getMockBuilder(RuleRepositoryInterface::class)
             ->disableOriginalConstructor()
             ->setMethods(['getList', 'getById', 'save', 'deleteById'])
@@ -62,8 +81,18 @@ class TestSubscribeManagement extends TestCase
         $this->_logger = $this->getMockBuilder(Logger::class)
             ->disableOriginalConstructor()
             ->getMock();
-        $this->subscriberManagement = $this->getMockBuilder(SubscribeManagement::class)
-            ->setConstructorArgs([
+    }
+
+    /**
+     * Test SubscribeManagement::subscribe method.
+     * Test if is already subscribed
+     */
+    public function testSubscribe()
+    {
+        $email = 'dmajidian@hotmail.com';
+        $subscribeManagement = $this->objectManager->getObject(SubscribeManagement::class);
+        $subscribeManagement =
+            new $subscribeManagement(
                 $this->subscriberFactory,
                 $this->ruleRepositoryInterface,
                 $this->searchCriteriaInterface,
@@ -72,20 +101,9 @@ class TestSubscribeManagement extends TestCase
                 $this->storeManagerInterface,
                 $this->transportBuilder,
                 $this->_logger
-            ])
-            ->setMethods(['subscribe', 'getRuleId', 'getCouponCode', 'sendEmail'])
-            ->getMock();
-    }
-
-
-    public function testSubscribe()
-    {
-        $email = 'dmajidian@hotmail.com';
-
-        $result = $this->subscriberManagement->subscribe($email);
-
+            );
+        $result = $subscribeManagement->subscribe($email);
         $expectedResult = '2';
         $this->assertEquals($expectedResult, $result);
     }
-
 }
