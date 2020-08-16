@@ -13,9 +13,14 @@ use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Store\Model\ScopeInterface;
 use Magento\Store\Model\StoreManagerInterface;
 use Magento\Framework\Mail\Template\TransportBuilder;
+use Majidian\Newsletter\Model\Logger\Logger;
 
 class SubscribeManagement implements SubscribeManagementInterface
 {
+    /**
+     * @var Logger
+     */
+    private $_logger;
     /**
      * @var ScopeConfigInterface
      */
@@ -28,7 +33,6 @@ class SubscribeManagement implements SubscribeManagementInterface
      * @var TransportBuilder
      */
     protected $transportBuilder;
-
     /**
      * @var SearchCriteriaBuilder
      */
@@ -45,6 +49,7 @@ class SubscribeManagement implements SubscribeManagementInterface
      * @var CouponRepositoryInterface
      */
     protected $coupon;
+
     /**
      * SubscribeManagement constructor.
      * @param \Magento\Newsletter\Model\SubscriberFactory $subscriberFactory
@@ -56,7 +61,8 @@ class SubscribeManagement implements SubscribeManagementInterface
         CouponRepositoryInterface $coupon,
         ScopeConfigInterface $scopeConfig,
         StoreManagerInterface $storeManager,
-        TransportBuilder $transportBuilder
+        TransportBuilder $transportBuilder,
+        Logger $logger
     ) {
         $this->subscriberFactory = $subscriberFactory;
         $this->rule = $rule;
@@ -65,6 +71,7 @@ class SubscribeManagement implements SubscribeManagementInterface
         $this->scopeConfig = $scopeConfig;
         $this->storeManager = $storeManager;
         $this->transportBuilder = $transportBuilder;
+        $this->_logger = $logger;
     }
 
     /**
@@ -93,8 +100,10 @@ class SubscribeManagement implements SubscribeManagementInterface
                 }
             } catch (LocalizedException $e) {
                 $status = 0;
+                $this->_logger->error(__('LocalizedException: %1 ', $e->getMessage()));
             } catch (\Exception $e) {
                 $status = 0;
+                $this->_logger->error(__('Exception: %1 ', $e->getMessage()));
             }
         }
         return (string) $status;
@@ -103,9 +112,11 @@ class SubscribeManagement implements SubscribeManagementInterface
     /**
      * @param $email
      * @param $coupon
+     * @return bool
      */
-    private function sendEmail($email, $coupon)
+    private function sendEmail($email, $coupon): bool
     {
+        $return = false;
         try {
             $transport = $this->transportBuilder
                 ->setTemplateIdentifier('majidian_newsletter_coupon')
@@ -125,17 +136,17 @@ class SubscribeManagement implements SubscribeManagementInterface
                 ])
                 ->addTo($email)
                 ->getTransport();
-
             $transport->sendMessage();
-        } catch (\Magento\Framework\Exception\MailException $exception) {
-
-        } catch (\Magento\Framework\Exception\NoSuchEntityException $exception) {
-
-        } catch (LocalizedException $exception) {
-
+            $return = true;
+        } catch (\Magento\Framework\Exception\MailException $e) {
+            $this->_logger->error(__('MailException: %1 ', $e->getMessage()));
+        } catch (\Magento\Framework\Exception\NoSuchEntityException $e) {
+            $this->_logger->error(__('NoSuchEntityException: %1 ', $e->getMessage()));
+        } catch (LocalizedException $e) {
+            $this->_logger->error(__('LocalizedException: %1 ', $e->getMessage()));
         }
 
-        return;
+        return $return;
     }
 
     /**
